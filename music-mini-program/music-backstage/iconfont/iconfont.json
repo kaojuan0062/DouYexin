@@ -1,0 +1,30 @@
+{
+  "id": "3886632",
+  "name": "music-backstage",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1029",
+      "name": "音乐",
+      "font_class": "yinle",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "2170932",
+      "name": "首页-首页",
+      "font_class": "shouye-shouye",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "5082143",
+      "name": "角色用户",
+      "font_class": "jiaoseyonghu",
+      "unicode": "e648",
+      "unicode_decimal": 58952
+    }
+  ]
+}

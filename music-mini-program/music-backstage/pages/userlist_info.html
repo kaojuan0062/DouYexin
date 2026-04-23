@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+		<title>用户信息 - 音乐后台管理系统</title>
+		<link href="../css/bootstrap.min.css" rel="stylesheet">
+		<link href="../css/materialdesignicons.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="../js/bootstrap-multitabs/multitabs.min.css">
+		<link href="../css/style.min.css" rel="stylesheet">
+		<link href="../iconfont/iconfont.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../jquery-confirm-v3.3.0/jquery-confirm-master/dist/jquery-confirm.min.css">
+		<style>
+			.mline-ellipsis {
+				overflow: hidden;
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 3;
+			}
+
+			.line-ellipsis {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.type-select label {
+				padding-top: 5px;
+				padding-right: 0px;
+			}
+
+			.type-select div {
+				padding-left: 0px;
+			}
+
+
+
+
+			.table-scroll table {
+				height: 500px;
+				width: 100%;
+				table-layout: fixed;
+			}
+
+			.table-scroll tbody {
+				display: block;
+				height: 458px;
+				overflow-y: auto;
+				overflow-x: hidden;
+			}
+
+
+			.table-scroll table thead,
+			.table-scroll tbody tr {
+				display: table;
+				width: 100%;
+				table-layout: fixed;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="playlist" class="container-fluid p-t-15">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="card">
+						<div class="card-toolbar clearfix">
+							<!-- 							<form class="form-inline col-lg-8" method="post" onsubmit="return false;">
+								<div class="row">
+									<div class="col-xs-8">
+										<div class="form-group type-select">
+											<label class="col-xs-5 control-label " for="example-select">歌单分类</label>
+											<div class="col-xs-7">
+												<select @change="queryplaylist(0)" width="100%" class="form-control"
+													id="example-select" v-model="type" name="type" size="1">
+													<option v-for="(item, index) in typeList" :key="item.id"
+														:value="item.id">
+														{{item.description}}
+													</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-4">
+									</div>
+								</div>
+							</form> -->
+							<div class="toolbar-btn-action form-inline col-lg-4">
+								<button @click="deleteUsers(0)" class="btn btn-danger m-r-5" href="#!">
+									<i class="mdi mdi-window-close"></i>
+									删除
+								</button>
+								<!-- <a class="btn btn-success m-r-5" href="#!"><i class="mdi mdi-check"></i> 启用</a>
+					            <a class="btn btn-warning m-r-5" href="#!"><i class="mdi mdi-block-helper"></i> 禁用</a>
+					            <a class="btn btn-danger" href="#!"><i class="mdi mdi-window-close"></i> 删除</a> -->
+
+							</div>
+						</div>
+						<div class="card-body">
+
+							<div class="table-responsive">
+								<table class="table table-bordered">
+									<thead>
+										<tr>
+											<th>
+												<label class="lyear-checkbox checkbox-primary">
+													<input type="checkbox" id="check-all"><span></span>
+												</label>
+											</th>
+											<th width="120">openId</th>
+											<th width="100">头像</th>
+											<th>昵称</th>
+											<th width="150">手机号</th>
+											<th>注册时间</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in userlist" :key="index">
+											<td>
+												<label class="lyear-checkbox checkbox-primary">
+													<input type="checkbox" name="ids" :value="item.id"><span></span>
+												</label>
+											</td>
+											<td>{{item.openid}}</td>
+											<td>
+												<a href="#" v-if="item.userpic!=''">
+													<img :src="item.userpic" width="100" alt="The user has no picture">
+												</a>
+											</td>
+											<td class="line-ellipsis">{{item.nickName}}</td>
+											<td>{{item.mobile}}</td>
+											<td>
+												{{item.createTime}}
+											</td>
+											<td>
+												<div class="btn-group">
+													<!-- <button @click="deleteUsers(0)" class="btn btn-danger"><i class="mdi mdi-close-octagon-outline"></i>
+													                删除</button> -->
+
+													<a @click="deleteUsers(item.id)" class="btn btn-xs btn-default"
+														href="#!" title="删除" data-toggle="tooltip"><i
+															class="mdi mdi-close-octagon-outline"></i></a>
+												</div>
+											</td>
+										</tr>
+
+									</tbody>
+								</table>
+							</div>
+							<ul class="pagination">
+								<li @click="queryUserlist(pageNumber-1)"><a href="#!">«</a></li>
+								<li @click="queryUserlist(item-1)" v-for="(item, index) in totalPages"
+									:class="{'active':item-1==pageNumber}">
+
+									<a href="#">{{item}}</a>
+								</li>
+								<li @click="queryUserlist(pageNumber+1)"><a href="#!">»</a></li>
+							</ul>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</body>
+
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../js/main.min.js"></script>
+	<!-- tables  -->
+	<script type="text/javascript" src="../js/bootstrap-table/bootstrap-table.min.js"></script>
+	<script type="text/javascript" src="../js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+
+	<script src="../jquery-confirm-v3.3.0/jquery-confirm-master/dist/jquery-confirm.min.js"></script>
+	<!-- vue -->
+	<script type="text/javascript" src="../js/vue/vue.js"></script>
+	<script type="text/javascript" src="../js/vue/axios-0.18.0.js"></script>
+	<script type="text/javascript" src="../js/vue/qs.min.js"></script>
+	<script type="text/javascript">
+		const urlHead = "http://localhost:8080";
+		var vu = new Vue({
+			el: "#playlist",
+			data() {
+				return {
+					type: 1,
+					totalPages: 0,
+					pageNumber: 0,
+					numberOfElements: 0,
+					userlist: [],
+				}
+			},
+			created() {
+				this.queryUserlist(0)
+
+			},
+			methods: {
+				//提示框
+				thisConfirm: function(types, message, pageNumber) {
+					$.confirm({
+						title: '提示',
+						content: message,
+						type: types,
+						typeAnimated: true,
+						buttons: {
+							tryAgain: {
+								text: '确定',
+								btnClass: 'btn-' + types,
+								action: function() {
+									vu.queryUserlist(pageNumber);
+								}
+							},
+						}
+					});
+				},
+				// 展示用户列表
+				queryUserlist: function(page) {
+					if (page >= this.totalPages) {
+						page = this.totalPages - 1;
+					}
+					if (page < 0) {
+						page = 0;
+					}
+					console.log("type==", this.type)
+					axios.get(urlHead + "/user", {
+							params: {
+								page: page
+							}
+						})
+						.then(res => {
+							console.log("获取到的所有用户信息：", res)
+							if (res.status == 200 && res.data != undefined) {
+								this.userlist = res.data.content
+								//当前总页码和当前页面映射
+								this.totalPages = res.data.totalPages
+								this.pageNumber = res.data.pageable.pageNumber
+								this.numberOfElements = res.data.numberOfElements
+								console.log("当前总页数：", res.data.totalPages)
+								console.log("当前页码：", res.data.pageable.pageNumber)
+							}
+						})
+						.catch(err => {
+							console.error(err);
+						})
+
+				},
+				//删除用户
+				deleteUsers: function(ids) {
+					var arrayIds = [];
+					if (ids == 0) { //批量添加
+						$(".table-bordered input[name='ids']:checked").each(function() {
+							var v = $(this).val();
+
+							console.log("获取到的用户", v);
+							arrayIds.push(v);
+						})
+					} else { //单个添加
+						arrayIds.push(ids);
+					}
+					//判断参数是否合理
+					if (arrayIds == null || arrayIds == undefined || arrayIds.length < 1) {
+						this.thisConfirm("dark", "请选择需要删除的用户...");
+						return false;
+					}
+					//将数据信息传递给后台
+					axios.delete(urlHead+"/user/deleteByIds", {
+							params: {
+								ids: arrayIds.toString(),
+							}
+						})
+						.then(res => {
+							console.log("用户删除返回的信息", res);
+							console.log("批量删除用户个数", arrayIds.length);
+							if (res.status == 200 && res.data >0) {
+								//判断删除的是否是当前页面唯一数据
+								if (this.numberOfElements == arrayIds.length) {
+									this.pageNumber = this.totalPages - 2;
+								}
+								this.thisConfirm("green", "用户删除【成功】", this.pageNumber);
+							} else {
+					  	this.thisConfirm("red", "用户删除【失败】", this.pageNumber);
+							}
+						})
+						.catch(err => {
+					  console.log("删除返回的异常信息", err);
+							this.thisConfirm("red", "用户删除【失败】", this.pageNumber);
+						})
+				}
+			},
+
+		})
+	</script>
+</html>

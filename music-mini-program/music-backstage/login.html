@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+		<title>登录页面 - 音乐后台管理系统</title>
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/materialdesignicons.min.css" rel="stylesheet">
+		<link href="css/style.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="jquery-confirm-v3.3.0/jquery-confirm-master/dist/jquery-confirm.min.css">
+		<style>
+			body {
+				background-color: #fff;
+			}
+
+		 .lyear-login-box {
+				position: relative;
+				overflow-x: hidden;
+				width: 100%;
+				height: 100%;
+				-webkit-transition: 0.5s;
+				-o-transition: 0.5s;
+				transition: 0.5s;
+			}
+
+			.lyear-login-left {
+				width: 50%;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				position: fixed;
+				height: 100%;
+				z-index: 555;
+				background-size: cover;
+				background-repeat: no-repeat;
+				background-position: center center;
+			}
+
+			.lyear-overlay {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				z-index: 10;
+				padding: 30px;
+				width: 100%;
+				background: rgba(0, 0, 0, 0.5);
+			}
+
+			.lyear-logo {
+				margin-bottom: 50px;
+			}
+
+			.lyear-logo img {
+				height: 60px;
+
+			}
+
+			.lyear-logo span {
+				color: black;
+				font-weight: bold;
+				font-size: 18px;
+				line-height: 40px;
+				height: 100%;
+			}
+
+			.lyear-featured {
+				z-index: 12;
+				position: absolute;
+				bottom: 0;
+				padding: 30px;
+				width: 100%;
+			}
+
+			.lyear-featured h4 {
+				color: #fff;
+		 	line-height: 32px;
+			}
+
+			.lyear-featured h4 small {
+				color: #fff;
+				display: block;
+				text-align: right;
+				margin-top: 15px;
+			}
+
+			.lyear-login-right {
+				margin-left: 50%;
+				position: relative;
+				z-index: 999;
+				padding: 100px;
+				background-color: #fff;
+			}
+
+		 @media screen and (max-width: 1024px) {
+				.lyear-login-right {
+					padding: 50px;
+				}
+			}
+
+			@media screen and (max-width: 820px) {
+				.lyear-login-left {
+					width: 100%;
+					position: relative;
+					z-index: 999;
+					height: 300px;
+				}
+
+				.lyear-login-right {
+					margin-left: 0;
+				}
+			}
+
+			@media screen and (max-width: 480px) {
+				.lyear-login-right {
+					padding: 50px;
+				}
+			}
+
+		 @media screen and (max-width: 320px) {
+				.lyear-login-right {
+					padding: 30px;
+				}
+			}
+		</style>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="js/v3.2.8/vue.global.prod.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="login">
+			<div class="lyear-login-box" id="login">
+				<div class="lyear-login-left" style="background-image: url(image/login-bg.jpg)">
+					<div class="lyear-overlay"></div>
+				</div>
+				<div class="lyear-login-right">
+
+					<div class="lyear-logo text-center">
+						<a href="#!">
+							<img src="image/login-logo.png" alt="logo" />
+							<span>音乐后台管理系统</span>
+						</a>
+					</div>
+					<form action="javascript:void(0)" method="post">
+						<div class="form-group">
+							<label for="username">用户名</label>
+							<input type="text" class="form-control" name="account" v-model="administrator.account"
+								id="username" placeholder="请输入您的用户名">
+						</div>
+
+						<div class="form-group">
+		 				<label for="password">密码</label>
+							<input type="password" class="form-control" name="password" v-model="administrator.password"
+								id="password" placeholder="请输入您的密码">
+						</div>
+
+						<div class="form-group">
+							<label for="captcha">验证码</label>
+							<div class="row">
+								<div class="col-xs-7">
+									<input type="text" name="imgCode" v-model="imgCode" id="captcha"
+										class="form-control" placeholder="验证码">
+								</div>
+								<div class="col-xs-5">
+									<img :src="captchaImg" class="pull-right" id="captcha" @click="codeImages"
+										style="cursor: pointer;" title="点击刷新" alt="captcha">
+								</div>
+							</div>
+						</div>
+
+
+						<div class="form-group">
+							<button @click="login" class="btn btn-block btn-primary" type="button">立即登录</button>
+						</div>
+						<footer class="text-center">
+							<p class="copyright">Copyright &copy; dou. <a target="_blank" href="#">music-backstage</a>
+							</p>
+						</footer>
+					</form>
+
+				</div>
+			</div>
+		</div>
+		
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/main.min.js"></script>
+		<script src="jquery-confirm-v3.3.0/jquery-confirm-master/dist/jquery-confirm.min.js"></script>
+
+		<script type="text/javascript" src="js/vue/vue.js"></script>
+		<script type="text/javascript" src="js/vue/axios-0.18.0.js"></script>
+		<script type="text/javascript" src="js/vue/qs.min.js"></script>
+		<script>
+			// const App = {
+			// 	data() {
+			// 		return {
+			// 			counter: 0
+			// 		}
+			// 	}
+			// };
+			// Vue.createApp(App).mount('#app');
+			var vu = new Vue({
+				el: "#login", //进行指定地址区域
+			 data: {
+					administrator: {
+						account: "",
+						password: "",
+					},
+					code: "",
+					captchaImg: "",
+					imgCode: "",
+				},
+				created() { //启动vue执行
+					this.codeImages()
+				},
+				methods: {
+					//提示框
+					thisConfirm: function(types, message, url) {
+						$.confirm({
+							title: '提示',
+							content: message,
+							type: types,
+							typeAnimated: true,
+							buttons: {
+								tryAgain: {
+									text: '确定',
+									btnClass: 'btn-' + types,
+									action: function() {
+										window.location.href = url
+									}
+								},
+							}
+						});
+					},
+
+					login: function() {
+						console.log('触发了login的函数................', this.administrator.account)
+						console.log('触发了login的函数................', this.administrator.password)
+						//验证，验证码是否正确
+						if (this.imgCode == null || this.imgCode == '' || this.imgCode == undefined) {
+							console.log('请输入验证码..............')
+							vu.thisConfirm('red', "请输入正确账户信息及验证码", "login.html")
+							return false;
+						}
+						//再次判断，账号和密码
+						if (this.administrator.account == null || this.administrator.account == '' || this.administrator.account ==
+							undefined) {
+							vu.thisConfirm('red', "请正确输入账户信息", "login.html")
+							return false;
+						}
+						if (this.administrator.password == null || this.administrator.password == '' || this.administrator
+							.password == undefined) {
+							vu.thisConfirm('red', "请正确输入账户信息", "login.html")
+							return false;
+						}
+						//进行判断验证码是否正确
+						if (this.code != this.imgCode) {
+							console.log('............验证码不正确')
+							vu.thisConfirm('red', "验证码错误", "login.html")
+							return false;
+						}
+
+						var qs = Qs;
+			 		axios.post("http://localhost:8080/administrator/login",
+							qs.stringify({
+								account: this.administrator.account,
+								password: this.administrator.password,
+								code: this.imgCode
+							})
+						).then(res => {
+							console.log('登陆返回的数据:', res)
+							if (res.status === 200) {
+								if (res.data != undefined && res.data != null && res.data != "") {
+									//进行跳转到首页
+									console.log("存入的菜单数据===", res.data);
+									window.localStorage.setItem("admin", JSON.stringify(res
+										.data)) //将账号存入到本地中
+
+									vu.thisConfirm('green', "登陆成功", "pages/index.html")
+								} else {
+									vu.thisConfirm('red', "登陆失败", "login.html")
+
+								}
+							} else {
+								vu.thisConfirm('red', "登陆失败", "login.html")
+							}
+						})
+
+					},
+					codeImages: function() { //获取对应的验证码
+						axios.get("http://localhost:8080/kaptcha")
+							.then(res => {
+								console.log('获取对应的验证码数据...', res.data)
+								this.code = res.data.code
+								this.captchaImg = res.data.captchaImg
+							})
+							.catch(err => {
+								console.error(err);
+							})
+
+					}
+				},
+
+
+			})
+		</script>
+	</body>
+</html>

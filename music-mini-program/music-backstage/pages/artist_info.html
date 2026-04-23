@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+		<title>歌手信息 - 音乐后台管理系统</title>
+		<link href="../css/bootstrap.min.css" rel="stylesheet">
+		<link href="../css/materialdesignicons.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="../js/bootstrap-multitabs/multitabs.min.css">
+		<link href="../css/style.min.css" rel="stylesheet">
+		<link href="../iconfont/iconfont.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../jquery-confirm-v3.3.0/jquery-confirm-master/dist/jquery-confirm.min.css">
+		<style>
+			.mline-ellipsis {
+				overflow: hidden;
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 3;
+			}
+
+			.line-ellipsis {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.type-select label {
+				padding-top: 5px;
+				padding-right: 0px;
+			}
+
+			.type-select div {
+				padding-left: 0px;
+			}
+
+
+
+
+			.table-scroll table {
+				height: 500px;
+				width: 100%;
+				table-layout: fixed;
+			}
+
+			.table-scroll tbody {
+				display: block;
+				height: 458px;
+				overflow-y: auto;
+				overflow-x: hidden;
+			}
+
+
+			.table-scroll table thead,
+			.table-scroll tbody tr {
+				display: table;
+				width: 100%;
+				table-layout: fixed;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="artists" class="container-fluid p-t-15">
+
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="card">
+						<div class="card-toolbar clearfix">
+							<form class="form-inline col-lg-8" method="post" onsubmit="return false;">
+								<div class="row">
+									<div class="col-xs-8">
+										<div class="form-group type-select">
+											<label class="col-xs-5 control-label " for="example-select">歌手榜单</label>
+											<div class="col-xs-7">
+												<select @change="queryArtists(0)" width="100%" class="form-control"
+													id="example-select" v-model="type" name="type" size="1">
+													<!-- <option v-for="(item, index) in typeList" :key="item.id"
+														:value="item.id">
+														{{item.description}}
+													</option> -->
+													<option value="1">
+														男歌手
+													</option>
+													<option value="2">
+														女歌手
+													</option>
+													<option value="3">
+														乐队
+													</option>
+													<option value="4">
+														热门歌手
+													</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-4">
+
+									</div>
+								</div>
+							</form>
+							<div class="toolbar-btn-action form-inline col-lg-4">
+								<button @click="insertArtistAndSong(0)" class="btn btn-primary m-r-5" href="#!">
+									<i class="mdi mdi-plus"></i>
+									添加
+								</button>
+								<!-- <a class="btn btn-success m-r-5" href="#!"><i class="mdi mdi-check"></i> 启用</a>
+					            <a class="btn btn-warning m-r-5" href="#!"><i class="mdi mdi-block-helper"></i> 禁用</a>
+					            <a class="btn btn-danger" href="#!"><i class="mdi mdi-window-close"></i> 删除</a> -->
+
+							</div>
+						</div>
+						<div class="card-body">
+
+							<div class="table-responsive">
+								<table class="table table-bordered">
+									<thead>
+										<tr>
+											<th>
+												<label class="lyear-checkbox checkbox-primary">
+													<input type="checkbox" id="check-all"><span></span>
+												</label>
+											</th>
+											<th width="120">ID</th>
+											<th width="100">歌手图片</th>
+											<th>歌手名称</th>
+											<th>歌曲数量</th>
+											<th>是否添加</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in artistlist" :key="index">
+											<td>
+												<label class="lyear-checkbox checkbox-primary">
+													<input type="checkbox" name="ids" :value="item.id"><span></span>
+												</label>
+											</td>
+											<td>{{item.id}}</td>
+											<td>
+												<a href="#" v-if="item.picurl!=''">
+													<img :src="item.picurl" width="100"
+														alt="The artist has no picture">
+												</a>
+											</td>
+											<td class="line-ellipsis">{{item.name}}</td>
+											<td>{{item.musicsize}}首</td>
+											<td>
+												<label class="lyear-switch switch-solid switch-success">
+													<input type="checkbox" checked="checked" v-if="item.status==0"
+														disabled="true">
+													<input type="checkbox" v-if="item.status==1" disabled="true">
+													<span></span>
+												</label>
+											</td>
+											<td>
+												<div class="btn-group">
+
+													<a @click="queryArtistDetail(item.id)"
+														class="btn btn-xs btn-default" href="#!" title="查看"
+														data-target=".show-detail-modal" data-toggle="modal"><i
+															class="mdi mdi-eye"></i></a>
+													<a @click="insertArtistAndSong(item.id)" data-toggle="modal"
+														data-target=".bs-example-modal-update"
+														class="btn btn-xs btn-default" href="#!" title="添加"
+														data-toggle="tooltip"><i class="mdi mdi-plus-one"></i></a>
+												</div>
+											</td>
+										</tr>
+
+									</tbody>
+								</table>
+							</div>
+							<ul class="pagination">
+								<li @click="queryArtists(pageNumber-1)"><a href="#!">«</a></li>
+								<li @click="queryArtists(item-1)" v-for="(item, index) in totalPages"
+									:class="{'active':item-1==pageNumber}">
+
+									<a href="#">{{item}}</a>
+								</li>
+								<li @click="queryArtists(pageNumber+1)"><a href="#!">»</a></li>
+							</ul>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<!-- ==================================================歌手详情========================================== -->
+			<div class="modal fade show-detail-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+									aria-hidden="true">×</span></button>
+							<h4 class="modal-title" id="myLargeModalLabel">歌手详情</h4>
+						</div>
+						<div class="modal-body">
+							<form class="form-horizontal" action="lyear_forms_elements.html" method="post"
+								onsubmit="return false;">
+								<div class="form-group">
+									<label class="col-md-3 control-label" for="example-text-input">歌手名称</label>
+									<div class="col-md-7">
+										<input name="id" v-model="artist.id" type="hidden">
+										<input class="form-control" type="text" id="example-text-input"
+											v-model="artist.name" name="name" placeholder="歌手名称...." disabled="true">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="col-md-3 control-label" for="example-hf-email">歌曲数量</label>
+									<div class="col-md-7 ">
+										<input class="form-control" type="text" id="example-text-input"
+											v-model="artist.musicsize" name="musicsize" placeholder="歌曲数量...."
+											disabled="true">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-3 control-label" for="example-text-input">歌手简介</label>
+									<div class="col-md-7">
+										<textarea v-model="artist.briefdesc" name="briefdesc" disabled="true"
+											class="form-control" id="example-textarea-input" rows="5"
+											placeholder="歌手简介...."></textarea>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-3 control-label" for="example-hf-email">状态</label>
+									<div class="col-md-7">
+										<!-- 状态为空闲 -->
+										<div class="example-box" v-if="artist.status==0">
+											<label class="lyear-radio radio-inline radio-primary">
+												<input v-model="artist.status" name="status" type="radio" value="0"
+													checked="checked" disabled="true"><span>已添加</span>
+											</label>
+											<label class="lyear-radio radio-inline radio-primary ">
+												<input v-model="artist.status" name="status" type="radio" value="1"
+													disabled="true"><span>待添加</span>
+											</label>
+										</div>
+										<!-- 状态已占用 -->
+										<div class="example-box" v-if="artist.status==1">
+											<label class="lyear-radio radio-inline radio-primary">
+												<input v-model="artist.status" name="status" type="radio" value="0"
+													disabled="true"><span>已添加</span>
+											</label>
+											<label class="lyear-radio radio-inline radio-primary ">
+												<input v-model="artist.status" name="status" type="radio" value="1"
+													checked="checked" disabled="true"><span>待添加</span>
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="alert alert-success" role="alert">歌曲详情</div>
+								<div class="card-body">
+									<div class="table-responsive table-scroll">
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+													<th>ID</th>
+													<th>
+														歌曲封面
+													</th>
+													<th>歌曲名称</th>
+													<th>歌手</th>
+													<th>歌曲时长</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr v-for="(item, index) in songList" :key="index">
+													<td>{{item.id}}</td>
+													<td>
+														<a href="#" v-if="item.picUrl!=''">
+															<img :src="item.picurl" width="60" alt="歌曲封面">
+														</a>
+
+													</td>
+													<td>{{item.name}}</td>
+													<td>{{item.artistName}}
+													</td>
+													<td>{{item.time}}</td>
+												</tr>
+
+											</tbody>
+										</table>
+									</div>
+								</div>
+
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+									<button v-if="artist.status==1" @click="insertArtistAndSong(artist.id)" type="button" class="btn btn-primary"
+										data-dismiss="modal">添加</button>
+										<button v-if="artist.status==0" @click="deleteArtistAndSong(artist.id)" type="button"
+											class="btn btn-danger" data-dismiss="modal">删除</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		</div>
+
+
+	</body>
+
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../js/main.min.js"></script>
+	<!-- tables  -->
+	<script type="text/javascript" src="../js/bootstrap-table/bootstrap-table.min.js"></script>
+	<script type="text/javascript" src="../js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+
+	<script src="../jquery-confirm-v3.3.0/jquery-confirm-master/dist/jquery-confirm.min.js"></script>
+	<!-- vue -->
+	<script type="text/javascript" src="../js/vue/vue.js"></script>
+	<script type="text/javascript" src="../js/vue/axios-0.18.0.js"></script>
+	<script type="text/javascript" src="../js/vue/qs.min.js"></script>
+	<script type="text/javascript">
+		const urlHead = "http://localhost:8080";
+		var vu = new Vue({
+			el: "#artists",
+			data() {
+				return {
+					type: 1,
+					totalPages: 0,
+					pageNumber: 0,
+					numberOfElements: 0,
+					artistlist: [{ //当前歌手分类的歌手列表
+						id: '',
+						name: '',
+						// type ,
+						picUrl: '',
+						musicSize: 0,
+						briefDesc: '',
+						status: '',
+					}],
+					typeList: [{ //类型列表
+						id: 0,
+						description: ''
+					}],
+					artist: { //歌手详情
+						id: '',
+						name: '',
+						// type '',
+						picUrl: '',
+						musicSize: 0,
+						briefDesc: '',
+						status: '',
+					},
+					songList: [{ //当前歌单的歌曲
+						id: '',
+						name: '',
+						artistId: '',
+						picurl: '',
+						url: '',
+						lyric: '',
+						time: '',
+						status: ''
+					}]
+
+
+				}
+			},
+			created() {
+				this.queryArtists(0)
+					//this.queryTypeList()
+			},
+			methods: {
+				//提示框
+				thisConfirm: function(types, message, pageNumber) {
+					$.confirm({
+						title: '提示',
+						content: message,
+						type: types,
+						typeAnimated: true,
+						buttons: {
+							tryAgain: {
+								text: '确定',
+								btnClass: 'btn-' + types,
+								action: function() {
+									vu.queryArtists(pageNumber);
+								}
+							},
+						}
+					});
+				},
+				// 展示歌单列表
+				queryArtists: function(page) {
+					if (page >= this.totalPages) {
+						page = this.totalPages - 1;
+					}
+					if (page < 0) {
+						page = 0;
+					}
+					console.log("type==", this.type)
+					axios.get(urlHead + "/artist/artistsByPage", {
+							params: {
+								page: page,
+								type: this.type,
+							}
+						})
+						.then(res => {
+							console.log("获取到的所有歌手信息：", res)
+							if (res.status == 200 && res.data != undefined) {
+								this.artistlist = res.data.content
+								//当前总页码和当前页面映射
+								this.totalPages = res.data.totalPages
+								this.pageNumber = res.data.pageable.pageNumber
+								this.numberOfElements = res.data.numberOfElements
+								console.log("当前总页数：", res.data.totalPages)
+								console.log("当前页码：", res.data.pageable.pageNumber)
+							}
+						})
+						.catch(err => {
+							console.error(err);
+						})
+				},
+				
+				//查询歌单歌曲
+				querySongsOfList: function(id) {
+					console.log("0要查询的歌手id===", id);
+					if (id == undefined || id == null || id == false) {
+						this.confirm("red", "请选择要查询的歌单", this.pageNumber)
+					}
+					console.log("1要查询的歌手id===", id);
+					axios.get(urlHead + "/songsofartist/getSongs", {
+							params: {
+								id: id
+							}
+						})
+						.then(res => {
+							console.log("查询到的歌手歌曲", res);
+							if (res.status == 200 && res.data != undefined) {
+								this.songList = res.data;
+							}
+							console.log("查询到的歌手歌曲,赋值后", this.songList);
+						})
+						.catch(err => {
+							console.log("查询歌手歌曲的错误信息", err);
+						})
+				},
+				//查询歌手详情
+				queryArtistDetail: function(id) {
+					console.log("0要查询的歌手id===", id);
+					if (id == undefined || id == null || id == false) {
+						this.confirm("red", "请选择要查看的歌手", this.pageNumber)
+					}
+					console.log("1要查询的歌手id===", id);
+					axios.get(urlHead + "/artist/getDetail", {
+							params: {
+								id: id
+							}
+						})
+						.then(res => {
+							console.log("查询到的歌手详情", res);
+							if (res.status == 200 && res.data != undefined) {
+								this.artist = res.data;
+							}
+							console.log("查询到的歌手详情,赋值后", this.artist);
+						})
+						.catch(err => {
+							console.log("查询歌说详情的错误信息", err);
+						})
+					this.querySongsOfList(id);
+				},
+				//将歌单及其歌曲添加至数据库
+				insertArtistAndSong: function(ids) {
+					var arrayIds = [];
+					if (ids == 0) { //批量添加
+						$(".table-bordered input[name='ids']:checked").each(function() {
+							var v = $(this).val();
+
+							console.log("获取到的歌单", v);
+							arrayIds.push(v);
+						})
+					} else { //单个添加
+						arrayIds.push(ids);
+					}
+					//判断参数是否合理
+					if (arrayIds == null || arrayIds == undefined || arrayIds.length < 1) {
+						this.thisConfirm("dark", "请选择需要批量添加的歌单...");
+						return false;
+					}
+					//传递后台
+					var qs = Qs;
+					axios.post(urlHead + "/artist", qs.stringify({
+							//设置对应参数信息
+							ids: arrayIds.toString(),
+							type: this.type
+						}))
+						.then(res => {
+							console.log("添加歌单返回数据", res);
+							if (res.status == 200) {
+								if (res.data == 0) {
+									vu.thisConfirm("dark", "该歌单已存在", this.pageNumber)
+								} else {
+									vu.thisConfirm("green", "歌单添加成功", this.pageNumber)
+								}
+							} else {
+								vu.thisConfirm("red", "歌单添加失败", this.pageNumber)
+							}
+						})
+						.catch(err => {
+							console.log(err);
+						});
+
+				},
+				deleteArtistAndSong:function(id){
+					if (id == null || id == undefined ) {
+						this.thisConfirm("dark", "请选择需要批量删除的会议室...");
+						return false;
+					}
+					
+					//将数据信息传递给后台
+					axios.delete(urlHead+"/artist", {
+							params: {
+								id:id
+							}
+						})
+						.then(res => {
+							console.log("歌单删除返回的信息", res);
+							
+					  if (res.status == 200 && res.data == true) {
+								//判断删除的是否是当前页面唯一数据
+								if (this.numberOfElements == 1) {
+									this.pageNumber = this.totalPages - 2;
+								}
+								this.thisConfirm("green", "歌手删除【成功】", this.pageNumber);
+							} else {
+								this.thisConfirm("red", "歌手删除【失败】", this.pageNumber);
+							}
+						})
+						.catch(err => {
+							console.log("删除返回的异常信息", err);
+							this.thisConfirm("red", "歌手删除【失败】", this.pageNumber);
+						})
+				}
+			},
+		})
+	</script>
+</html>
